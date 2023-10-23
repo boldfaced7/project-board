@@ -31,6 +31,8 @@ class ArticleServiceTest {
     @InjectMocks private ArticleService sut;
 
     @Mock private ArticleRepository articleRepository;
+    @Mock SearchTypeStrategyComposite searchTypeStrategyComposite;
+    @Mock SearchTypeStrategy.TitleStrategy titleStrategy;
 
     @DisplayName("검색어 없이 게시글을 검색하면, 게시글 페이지를 반환한다.")
     @Test
@@ -57,7 +59,9 @@ class ArticleServiceTest {
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
 
-        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
+        given(searchTypeStrategyComposite.getSearchTypeStrategy(searchType.name())).willReturn(titleStrategy);
+        given(titleStrategy.searchArticles(searchKeyword, pageable)).willReturn(Page.empty());
+
 
         // When
         Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
@@ -65,7 +69,8 @@ class ArticleServiceTest {
         // Then
         assertThat(articles).isEmpty();
 
-        then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
+        then(searchTypeStrategyComposite).should().getSearchTypeStrategy(searchType.name());
+        then(titleStrategy.searchArticles(searchKeyword, pageable));
     }
 
     @DisplayName("게시글을 조회하면, 게시글을 반환한다.")
@@ -166,7 +171,7 @@ class ArticleServiceTest {
         // Given
         Long articleId = 1L;
 
-        willDoNothing().given(articleRepository).delete(any(Article.class));
+        willDoNothing().given(articleRepository).deleteById(articleId);
 
         // When
         sut.deleteArticle(1L);
