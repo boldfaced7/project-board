@@ -5,6 +5,7 @@ import com.project.board.dto.ArticleWithCommentsDto;
 import com.project.board.dto.UserAccountDto;
 import com.project.board.service.ArticleService;
 import com.project.board.service.PaginationService;
+import com.project.board.service.SearchTypeStrategyComposite;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,9 +76,9 @@ class ArticleControllerTest {
 
         // When & Then
         mvc.perform(get("/articles")
-                    .queryParam("page", String.valueOf(pageNumber))
-                    .queryParam("size", String.valueOf(pageSize))
-                    .queryParam("sort", sortName + ", " + direction))
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", sortName + "," + direction))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
@@ -86,7 +87,7 @@ class ArticleControllerTest {
 
         then(articleService).should().searchArticles(null, null, pageable);
         then(paginationService).should().getPaginationBarNumber(pageable.getPageNumber(), Page.empty().getTotalPages());
-        
+
     }
 
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
@@ -98,7 +99,7 @@ class ArticleControllerTest {
         given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
 
         // When & Then
-        mvc.perform(get("/articles" + articleId))
+        mvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
