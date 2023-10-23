@@ -81,7 +81,7 @@ class ArticleCommentServiceTest {
         sut.saveArticleComment(dto);
 
         // Then
-        then(articleCommentRepository).should().getReferenceById(dto.articleId());
+        then(articleRepository).should().getReferenceById(dto.articleId());
     }
 
     @DisplayName("댓글 정보를 입력하면, 댓글을 수정한다.")
