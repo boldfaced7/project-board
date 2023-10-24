@@ -1,6 +1,9 @@
 package com.project.board.controller;
 
-import com.project.board.domain.type.SearchType;
+import com.project.board.domain.constant.FormStatus;
+import com.project.board.domain.constant.SearchType;
+import com.project.board.dto.UserAccountDto;
+import com.project.board.dto.request.ArticleRequest;
 import com.project.board.dto.response.ArticleResponse;
 import com.project.board.dto.response.ArticleWithCommentResponse;
 import com.project.board.service.ArticleService;
@@ -12,10 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public String article(@PathVariable Long articleId, ModelMap map) {
-        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithComments(articleId));
 
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.articleCommentsRespons());
@@ -56,11 +56,11 @@ public class ArticleController {
     }
 
     @GetMapping("/search-hashtag")
-    public String searchHashtag(
+    public String searchArticleHashtag(
             @RequestParam(required = false) String searchValue,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             ModelMap map
-            ) {
+    ) {
         Page<ArticleResponse> articles = articleService.searchArticleViaHashtag(searchValue, pageable)
                 .map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumber(pageable.getPageNumber(), articles.getTotalPages());
@@ -72,5 +72,54 @@ public class ArticleController {
         map.addAttribute("searchType", SearchType.HASHTAG);
 
         return "articles/search-hashtag";
+    }
+
+    @GetMapping("/form")
+    public String articleForm(ModelMap map) {
+        map.addAttribute("formStatus", FormStatus.CREATE);
+
+        return "articles/form";
+    }
+
+    @PostMapping("/form")
+    public String postNewArticle(ArticleRequest articleRequest) {
+        // TODO: 인증 정보를 넣어줘야
+
+        articleService.saveArticle(articleRequest.toDto(
+                UserAccountDto.of(
+                        1L, "uno", "asdf1234", "uno@mail.com", "Uno", "memo")));
+
+        return "redirect:/articles";
+    }
+
+    @GetMapping("/{articleId}/form")
+    public String updateArticleForm(@PathVariable Long articleId, ModelMap map) {
+        ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+
+        map.addAttribute("article", article);
+        map.addAttribute("formStatus", FormStatus.UPDATE);
+
+        return "articles/form";
+    }
+
+    @PostMapping("/{articleId}/form")
+    public String updateArticle(@PathVariable Long articleId, ArticleRequest articleRequest) {
+        // TODO: 인증 정보를 넣어줘야
+
+        articleService.updateArticle(articleId, articleRequest.toDto(
+                UserAccountDto.of(
+                        1L, "uno", "asdf1234", "uno@mail.com", "Uno", "memo", null, null, null, null
+                )));
+
+        return "redirect:/articles/" + articleId;
+    }
+
+    @PostMapping("/{articleId}/delete")
+    public String deleteArticle(@PathVariable Long articleId) {
+        // TODO: 인증 정보를 넣어줘야
+        articleService.deleteArticle(articleId);
+
+        return "redirect:/articles";
+
     }
 }
