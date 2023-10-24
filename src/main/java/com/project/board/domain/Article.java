@@ -56,9 +56,11 @@ public class Article extends AuditingFields {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Article article)) return false;
-        return id != null && Objects.equals(id, article.id);
+        // Article that 부분은 Java 16부터 도입된 패턴 변수(Pattern Variable)를 사용한 것으로, o를 Article 타입으로 다운캐스팅하고 그 결과를 that이라는 변수에 바인딩
+        if (!(o instanceof Article that)) return false;
+        return id != null && id.equals(that.getId());
     }
+
 
     @Override
     public int hashCode() {
