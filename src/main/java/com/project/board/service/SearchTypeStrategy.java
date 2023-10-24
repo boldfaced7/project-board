@@ -1,7 +1,7 @@
 package com.project.board.service;
 
 import com.project.board.domain.Article;
-import com.project.board.domain.type.SearchType;
+import com.project.board.domain.constant.SearchType;
 import com.project.board.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
