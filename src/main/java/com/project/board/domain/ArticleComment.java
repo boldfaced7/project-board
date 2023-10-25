@@ -19,10 +19,12 @@ public class ArticleComment extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
     private Article article; // 게시글 (ID)
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_account_id")
     private UserAccount userAccount;
 
     @Column(nullable = false, length = 500)

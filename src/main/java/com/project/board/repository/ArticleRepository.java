@@ -7,11 +7,14 @@ import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import java.util.Optional;
 
 @RepositoryRestResource
 public interface ArticleRepository extends
@@ -20,10 +23,27 @@ public interface ArticleRepository extends
         QuerydslPredicateExecutor<Article>,
         QuerydslBinderCustomizer<QArticle> {
 
+    @Override
+    @EntityGraph(attributePaths = {"userAccount"})
+    Page<Article> findAll(Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"userAccount"})
+    Optional<Article> findById(Long id);
+
+    @EntityGraph(attributePaths = {"userAccount"})
     Page<Article> findByTitleContaining(String title, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount"})
     Page<Article> findByContentContaining(String content, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount"})
     Page<Article> findByUserAccountUserIdContaining(String userId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount"})
     Page<Article> findByUserAccountNicknameContaining(String nickname, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"userAccount"})
     Page<Article> findByHashtag(String hashtag, Pageable pageable);
 
     void deleteByIdAndUserAccountUserId(Long articleId, String  userId);

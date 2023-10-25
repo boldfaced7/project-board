@@ -4,6 +4,7 @@ import com.project.board.domain.ArticleComment;
 import com.project.board.domain.QArticleComment;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -18,6 +19,7 @@ public interface ArticleCommentRepository extends
         QuerydslPredicateExecutor<ArticleComment>,
         QuerydslBinderCustomizer<QArticleComment> {
 
+    @EntityGraph(attributePaths = {"article", "userAccount"})
     List<ArticleComment> findByArticleId(Long articleId);
     void deleteByIdAndUserAccountUserId(Long articleCommentId, String userId);
 
