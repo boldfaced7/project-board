@@ -1,14 +1,14 @@
 package com.project.board.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(columnList = "userId", unique = true),
         @Index(columnList = "email", unique = true),
@@ -21,22 +21,34 @@ public class UserAccount extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
     @Column(nullable = false, length = 50)
     private String userId;
-    @Setter
+
     @Column(nullable = false)
     private String userPassword;
-    @Setter
+
     @Column(length = 100)
     private String email;
-    @Setter
+
     @Column(length = 100)
     private String nickname;
-    @Setter
+
     private String memo;
 
-    protected UserAccount() {
+    @OrderBy("createdAt DESC")
+    @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL)
+    private Set<Article> articles = new LinkedHashSet<>();
+
+    @OrderBy("createdAt DESC")
+    @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL)
+    private Set<ArticleComment> articleComments = new LinkedHashSet<>();
+
+    public void updateUserAccount(String userId, String userPassword, String email, String nickname, String memo) {
+        this.userId = userId;
+        this.userPassword = userPassword;
+        this.email = email;
+        this.nickname = nickname;
+        this.memo = memo;
     }
 
     public UserAccount(String userId, String userPassword, String email, String nickname, String memo) {
