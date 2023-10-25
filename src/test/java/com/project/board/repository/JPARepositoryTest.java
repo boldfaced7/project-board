@@ -61,7 +61,7 @@ class JPARepositoryTest {
         // Given
         Article article = articleRepository.findById(1L).orElseThrow();
         String updatedHashtag = "#springboot";
-        article.setHashtag(updatedHashtag);
+        article.updateArticle(article.getTitle(), article.getContent(), updatedHashtag);
 
         // When
         Article savedArticle = articleRepository.save(article);
