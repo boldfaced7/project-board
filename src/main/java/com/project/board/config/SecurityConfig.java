@@ -14,21 +14,27 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
+import java.beans.Introspector;
 
 @Configuration
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/",
-                                "/articles",
-                                "/articles/search-hashtag"
-                        ).permitAll()
+                                new MvcRequestMatcher(introspector, "/"),
+                                new MvcRequestMatcher(introspector, "articles"),
+                                new MvcRequestMatcher(introspector, "articles/search-hashtag"),
+                                new MvcRequestMatcher(introspector, "h2-console/**"),
+                                new MvcRequestMatcher(introspector, "/css/**")
+                                ).permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"))
